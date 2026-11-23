@@ -169,7 +169,7 @@ textarea.in{resize:vertical;min-height:84px}
 
 /* PRICING */
 .price-table{background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden}
-.pt-row{display:grid;grid-template-columns:2fr 1fr 1fr;padding:18px 28px;border-bottom:1px solid var(--line);align-items:center;font-size:.95rem}
+.pt-row{display:grid;column-gap:14px;grid-template-columns:2fr 1fr 1fr;padding:18px 28px;border-bottom:1px solid var(--line);align-items:center;font-size:.95rem}
 .pt-row:last-child{border-bottom:0}
 .pt-row.head{background:rgba(47,123,255,.08);font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--blue2);font-weight:600}
 .pt-row b{font-family:"Space Grotesk"}
@@ -327,7 +327,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     <div class="section-head">
       <span class="eyebrow">Price calculator</span>
       <h2>How much will it cost?</h2>
-      <p>Share your location, tell us where it's going, and get an instant estimate. £75 call-out plus £2.75 per mile, for jobs within 100 miles.</p>
+      <p>Share your location, tell us where it's going, and get an instant estimate. £2.75 per mile plus a £75 call-out, or a £125 call-out for trips over 100 miles.</p>
     </div>
     <div class="est-shell">
       <form class="panel" id="estForm" novalidate>
@@ -357,10 +357,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
         <div class="sum-line"><span>From</span><span id="eFrom">—</span></div>
         <div class="sum-line"><span>To</span><span id="eTo">—</span></div>
         <div class="sum-line"><span>Distance</span><span id="eMiles">—</span></div>
-        <div class="sum-line"><span>Call-out charge</span><span>£75.00</span></div>
+        <div class="sum-line"><span id="eCallLabel">Call-out charge</span><span id="eCall">—</span></div>
         <div class="sum-line"><span>Mileage (£2.75/mile)</span><span id="eMileCost">—</span></div>
         <div class="total"><span style="color:var(--muted)">Estimated total</span><b id="eTotal">£0.00</b></div>
-        <div class="est-out" id="eOut">This trip is over our 100-mile service radius, so we can't price it online. Please <a href="tel:+447920129198">call 07920 129198</a> for a quote.</div>
         <div class="est-actions">
           <button type="button" class="btn btn-primary" id="eBook" disabled>Book this job</button>
           <a href="tel:+447920129198" class="btn btn-ghost">Call us</a>
@@ -518,6 +517,23 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       <h2>Clear prices. No surprises.</h2>
       <p>Guide prices below — your online estimate includes distance and extras.</p>
     </div>
+    <h3 style="font-size:1.25rem;margin-bottom:14px">Collection &amp; delivery prices</h3>
+    <div class="price-table" style="margin-bottom:18px">
+      <div class="pt-row head"><span>Trip distance (pick-up to drop-off)</span><span>Call-out</span><span>Per mile</span></div>
+      <div class="pt-row"><span><b>Up to 100 miles</b><small>£75 + (miles × £2.75)</small></span><span>£75</span><span>£2.75</span></div>
+      <div class="pt-row"><span><b>Over 100 miles</b><small>£125 + (miles × £2.75)</small></span><span>£125</span><span>£2.75</span></div>
+    </div>
+    <div class="price-table" style="margin-bottom:12px">
+      <div class="pt-row head"><span>Example trip</span><span>Calculation</span><span>Total</span></div>
+      <div class="pt-row"><span><b>10 miles</b></span><span>£75 + £27.50</span><span><b>£102.50</b></span></div>
+      <div class="pt-row"><span><b>25 miles</b></span><span>£75 + £68.75</span><span><b>£143.75</b></span></div>
+      <div class="pt-row"><span><b>50 miles</b></span><span>£75 + £137.50</span><span><b>£212.50</b></span></div>
+      <div class="pt-row"><span><b>100 miles</b></span><span>£75 + £275.00</span><span><b>£350.00</b></span></div>
+      <div class="pt-row"><span><b>150 miles</b></span><span>£125 + £412.50</span><span><b>£537.50</b></span></div>
+      <div class="pt-row"><span><b>200 miles</b></span><span>£125 + £550.00</span><span><b>£675.00</b></span></div>
+    </div>
+    <p class="note" style="margin-bottom:40px">Distance is the driving distance from pick-up to drop-off, charged per whole mile (rounded up). <a href="#estimate" style="color:var(--blue2);text-decoration:underline">Use the price calculator</a> for your exact trip. Final price confirmed by phone before dispatch.</p>
+    <h3 style="font-size:1.25rem;margin-bottom:14px">Other services</h3>
     <div class="price-table">
       <div class="pt-row head"><span>Service</span><span>From</span><span>Per mile</span></div>
       <div class="pt-row"><span><b>Vehicle Recovery</b><small>Includes first 5 miles</small></span><span>£65</span><span>£2.20</span></div>
@@ -752,9 +768,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 })();
 </script>
 <script>
-/* Price estimate calculator: £75 call-out + £2.75/mile, max 100 miles */
+/* Price estimate calculator: £2.75/mile + £75 call-out (up to 100 miles) or £125 call-out (over 100 miles) */
 (function(){
-  const CALLOUT = 75, PER_MILE = 2.75, MAX_MILES = 100;
+  const CALLOUT = 75, CALLOUT_LONG = 125, PER_MILE = 2.75, LONG_MILES = 100;
   const $ = s => document.querySelector(s);
   const fromIn = $('#estFrom'), toIn = $('#estTo');
   let fromPoint = null;          // {lat, lon, label} when filled from GPS
@@ -859,19 +875,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       try{ b = await geocode(toIn.value.trim()); }catch(e){ toIn.classList.add('err'); throw new Error('We couldn’t find the drop-off location. Try a full postcode.'); }
       const d = await roadMiles(a, b);
       const miles = Math.max(1, Math.ceil(d.miles));   // charged per whole mile
-      const outOfArea = d.miles > MAX_MILES;
+      const long = miles > LONG_MILES;
+      const callout = long ? CALLOUT_LONG : CALLOUT;
       const mileCost = miles * PER_MILE;
-      const total = CALLOUT + mileCost;
+      const total = callout + mileCost;
 
       $('#eFrom').textContent = a.label;
       $('#eTo').textContent = b.label;
       $('#eMiles').textContent = miles + ' miles' + (d.road ? '' : ' (approx.)');
-      $('#eMileCost').textContent = outOfArea ? '—' : gbp(mileCost);
-      $('#eTotal').textContent = outOfArea ? 'Call for quote' : gbp(total);
-      $('#eOut').style.display = outOfArea ? 'block' : 'none';
-      $('#eBook').disabled = outOfArea;
-      lastQuote = outOfArea ? null : {from:fromIn.value.trim(), to:toIn.value.trim(), miles, total};
-      status(st, outOfArea ? 'Outside our 100-mile radius.' : 'Estimate ready ✓', outOfArea ? 'bad' : 'ok');
+      $('#eCallLabel').textContent = long ? 'Call-out (over 100 miles)' : 'Call-out (up to 100 miles)';
+      $('#eCall').textContent = gbp(callout);
+      $('#eMileCost').textContent = gbp(mileCost);
+      $('#eTotal').textContent = gbp(total);
+      $('#eBook').disabled = false;
+      lastQuote = {from:fromIn.value.trim(), to:toIn.value.trim(), miles, total};
+      status(st, 'Estimate ready ✓', 'ok');
     }catch(e){
       status(st, e.message && !/^(lookup|notfound|Failed)/.test(e.message) ? e.message : 'Something went wrong looking that up. Please check the locations or call us.', 'bad');
     }finally{
