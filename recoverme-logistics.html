@@ -38,7 +38,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .logo{display:flex;align-items:center;gap:10px;font-family:"Space Grotesk";font-weight:700;font-size:1.15rem}
 .logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center}
 .logo span em{font-style:normal;color:var(--blue2)}
-.nav-links{display:flex;gap:30px;font-size:.93rem;color:var(--muted)}
+.nav-links{display:flex;gap:24px;font-size:.93rem;color:var(--muted);white-space:nowrap}
 .nav-links a:hover{color:var(--text)}
 .nav-cta{display:flex;gap:10px;align-items:center}
 .nav-phone{font-weight:600;font-size:.93rem;display:flex;align-items:center;gap:8px}
@@ -82,6 +82,22 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .card p{color:var(--muted);font-size:.93rem;margin-bottom:18px}
 .card .from{font-size:.85rem;color:var(--muted)}
 .card .from b{color:var(--text);font-family:"Space Grotesk";font-size:1.1rem}
+
+/* ESTIMATE CALCULATOR */
+.estimate{background:var(--navy2)}
+.est-shell{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:start}
+.loc-wrap{position:relative;display:flex;gap:10px}
+.loc-wrap .in{flex:1}
+.loc-btn{flex:none;white-space:nowrap;padding:0 16px;border-radius:11px}
+.est-status{font-size:.82rem;color:var(--muted);min-height:1.2em;margin-top:-4px;margin-bottom:10px}
+.est-status.ok{color:#9df0c8}.est-status.bad{color:#ff8f9a}
+.est-result .sum-line span:last-child{font-weight:600}
+.est-out{margin-top:16px;padding:16px;border-radius:14px;background:rgba(255,93,108,.08);border:1px solid rgba(255,93,108,.35);color:#ffc2c8;font-size:.9rem;display:none}
+.est-out a{color:#fff;font-weight:600;text-decoration:underline}
+.est-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:sp .7s linear infinite;display:none}
+.busy .spin{display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
 
 /* STEPS */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
@@ -189,7 +205,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 .mbar{display:none}
 
 @media (max-width:980px){
-  .hero .wrap,.book-shell,.faq-grid{grid-template-columns:1fr}
+  .hero .wrap,.book-shell,.est-shell,.faq-grid{grid-template-columns:1fr}
   .grid4,.steps{grid-template-columns:1fr 1fr}
   .pay-grid,.contact-grid{grid-template-columns:1fr}
   .summary{position:static}
@@ -224,6 +240,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     </a>
     <div class="nav-links" id="navLinks">
       <a href="#services">Services</a>
+      <a href="#estimate">Get a quote</a>
       <a href="#how">How it works</a>
       <a href="#pricing">Pricing</a>
       <a href="#payment">Payment</a>
@@ -248,6 +265,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       <div class="hero-actions">
         <a href="#book" class="btn btn-primary">Book a recovery
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#estimate" class="btn btn-ghost">Get an instant price</a>
         <a href="tel:+447920129198" class="btn btn-ghost">Call 07920 129198</a>
       </div>
       <div class="stats">
@@ -299,6 +317,56 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
         <p>Single items to full flat moves. Blankets, straps and two-person lifts so your furniture arrives as it left.</p>
         <div class="from">From <b>£60</b></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE ESTIMATE CALCULATOR -->
+<section class="estimate" id="estimate">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Price calculator</span>
+      <h2>How much will it cost?</h2>
+      <p>Share your location, tell us where it's going, and get an instant estimate. £75 call-out plus £2.75 per mile, for jobs within 100 miles.</p>
+    </div>
+    <div class="est-shell">
+      <form class="panel" id="estForm" novalidate>
+        <div class="field">
+          <label class="l" for="estFrom">Your current location (pick-up)</label>
+          <div class="loc-wrap">
+            <input class="in" id="estFrom" placeholder="Postcode or address" autocomplete="street-address">
+            <button type="button" class="btn btn-ghost loc-btn" id="locBtn" aria-label="Use my current location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+              Use my location
+            </button>
+          </div>
+        </div>
+        <p class="est-status" id="locStatus" aria-live="polite"></p>
+        <div class="field">
+          <label class="l" for="estTo">Drop-off location</label>
+          <input class="in" id="estTo" placeholder="Postcode or address">
+        </div>
+        <div class="est-actions">
+          <button type="submit" class="btn btn-primary" id="estBtn"><span class="spin"></span>Calculate price</button>
+        </div>
+        <p class="est-status" id="estStatus" aria-live="polite" style="margin-top:12px"></p>
+      </form>
+
+      <aside class="panel est-result">
+        <h4 style="font-size:1.1rem;margin-bottom:18px">Your estimate</h4>
+        <div class="sum-line"><span>From</span><span id="eFrom">—</span></div>
+        <div class="sum-line"><span>To</span><span id="eTo">—</span></div>
+        <div class="sum-line"><span>Distance</span><span id="eMiles">—</span></div>
+        <div class="sum-line"><span>Call-out charge</span><span>£75.00</span></div>
+        <div class="sum-line"><span>Mileage (£2.75/mile)</span><span id="eMileCost">—</span></div>
+        <div class="total"><span style="color:var(--muted)">Estimated total</span><b id="eTotal">£0.00</b></div>
+        <div class="est-out" id="eOut">This trip is over our 100-mile service radius, so we can't price it online. Please <a href="tel:+447920129198">call 07920 129198</a> for a quote.</div>
+        <div class="est-actions">
+          <button type="button" class="btn btn-primary" id="eBook" disabled>Book this job</button>
+          <a href="tel:+447920129198" class="btn btn-ghost">Call us</a>
+        </div>
+        <p class="note">Estimate uses the driving distance between the two locations. The final price is confirmed by phone before dispatch.</p>
+      </aside>
     </div>
   </div>
 </section>
@@ -681,6 +749,148 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 
   $$('#navLinks a').forEach(a => a.addEventListener('click', () => $('#navLinks').classList.remove('open')));
   update();
+})();
+</script>
+<script>
+/* Price estimate calculator: £75 call-out + £2.75/mile, max 100 miles */
+(function(){
+  const CALLOUT = 75, PER_MILE = 2.75, MAX_MILES = 100;
+  const $ = s => document.querySelector(s);
+  const fromIn = $('#estFrom'), toIn = $('#estTo');
+  let fromPoint = null;          // {lat, lon, label} when filled from GPS
+  let lastQuote = null;
+  let asked = false;
+
+  const gbp = n => '£' + n.toLocaleString('en-GB', {minimumFractionDigits:2, maximumFractionDigits:2});
+  function status(el, msg, cls){ el.textContent = msg; el.className = 'est-status' + (cls ? ' ' + cls : ''); }
+
+  // ---- geocoding (UK) ----
+  const PC_RE = /^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/;
+  async function geocode(q){
+    const pc = q.replace(/\s+/g, '').toUpperCase();
+    if(PC_RE.test(pc)){
+      try{
+        const r = await fetch('https://api.postcodes.io/postcodes/' + encodeURIComponent(pc));
+        if(r.ok){
+          const j = (await r.json()).result;
+          if(j && j.latitude != null) return {lat:j.latitude, lon:j.longitude, label:j.postcode + (j.admin_district ? ', ' + j.admin_district : '')};
+        }
+      }catch(e){}
+    }
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=gb&q=' + encodeURIComponent(q));
+    if(!r.ok) throw new Error('lookup');
+    const j = await r.json();
+    if(!j.length) throw new Error('notfound');
+    return {lat:+j[0].lat, lon:+j[0].lon, label:j[0].display_name.split(',').slice(0,3).join(',')};
+  }
+
+  async function reverse(lat, lon){
+    try{
+      const r = await fetch(`https://api.postcodes.io/postcodes?lon=${lon}&lat=${lat}&limit=1&radius=2000`);
+      const j = await r.json();
+      if(j.result && j.result.length){ const p = j.result[0]; return p.postcode + (p.admin_district ? ', ' + p.admin_district : ''); }
+    }catch(e){}
+    try{
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+      const j = await r.json();
+      if(j.display_name) return j.display_name.split(',').slice(0,3).join(',');
+    }catch(e){}
+    return lat.toFixed(5) + ', ' + lon.toFixed(5);
+  }
+
+  // ---- distance ----
+  function crowMiles(a, b){
+    const R = 3958.8, toR = x => x * Math.PI / 180;
+    const dLat = toR(b.lat - a.lat), dLon = toR(b.lon - a.lon);
+    const h = Math.sin(dLat/2)**2 + Math.cos(toR(a.lat)) * Math.cos(toR(b.lat)) * Math.sin(dLon/2)**2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  async function roadMiles(a, b){
+    try{
+      const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`);
+      const j = await r.json();
+      if(j.code === 'Ok' && j.routes.length) return {miles: j.routes[0].distance / 1609.344, road:true};
+    }catch(e){}
+    // fallback: straight line + 25% to approximate roads
+    return {miles: crowMiles(a, b) * 1.25, road:false};
+  }
+
+  // ---- ask for the customer's location ----
+  function askLocation(){
+    asked = true;
+    if(!('geolocation' in navigator)){ status($('#locStatus'), 'Location not supported on this device. Please type your postcode.', 'bad'); return; }
+    status($('#locStatus'), 'Finding your location…');
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const {latitude:lat, longitude:lon} = pos.coords;
+      const label = await reverse(lat, lon);
+      fromPoint = {lat, lon, label};
+      fromIn.value = label;
+      status($('#locStatus'), 'Location found ✓', 'ok');
+      if(toIn.value.trim()) calculate();
+    }, err => {
+      const msg = err.code === 1
+        ? 'Location access was blocked. Please type your postcode, or allow location in your browser settings.'
+        : 'We couldn’t get your location. Please type your postcode.';
+      status($('#locStatus'), msg, 'bad');
+    }, {enableHighAccuracy:true, timeout:15000, maximumAge:60000});
+  }
+  $('#locBtn').addEventListener('click', askLocation);
+  fromIn.addEventListener('input', () => { fromPoint = null; status($('#locStatus'), ''); });
+
+  // Ask for location automatically the first time the calculator comes into view
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es => {
+      if(es.some(e => e.isIntersecting)){ io.disconnect(); if(!asked && !fromIn.value.trim()) askLocation(); }
+    }, {threshold:0.4});
+    io.observe($('#estimate'));
+  }
+
+  // ---- calculate ----
+  async function calculate(){
+    const st = $('#estStatus'), btn = $('#estBtn');
+    if(!fromIn.value.trim()){ fromIn.classList.add('err'); status(st, 'Please enter your pick-up location or tap "Use my location".', 'bad'); return; }
+    if(!toIn.value.trim()){ toIn.classList.add('err'); status(st, 'Please enter a drop-off location.', 'bad'); return; }
+    fromIn.classList.remove('err'); toIn.classList.remove('err');
+    btn.classList.add('busy'); btn.disabled = true; status(st, 'Working out the distance…');
+    try{
+      let a = fromPoint;
+      if(!a){ try{ a = await geocode(fromIn.value.trim()); }catch(e){ fromIn.classList.add('err'); throw new Error('We couldn’t find your pick-up location. Try a full postcode.'); } }
+      let b;
+      try{ b = await geocode(toIn.value.trim()); }catch(e){ toIn.classList.add('err'); throw new Error('We couldn’t find the drop-off location. Try a full postcode.'); }
+      const d = await roadMiles(a, b);
+      const miles = Math.max(1, Math.ceil(d.miles));   // charged per whole mile
+      const outOfArea = d.miles > MAX_MILES;
+      const mileCost = miles * PER_MILE;
+      const total = CALLOUT + mileCost;
+
+      $('#eFrom').textContent = a.label;
+      $('#eTo').textContent = b.label;
+      $('#eMiles').textContent = miles + ' miles' + (d.road ? '' : ' (approx.)');
+      $('#eMileCost').textContent = outOfArea ? '—' : gbp(mileCost);
+      $('#eTotal').textContent = outOfArea ? 'Call for quote' : gbp(total);
+      $('#eOut').style.display = outOfArea ? 'block' : 'none';
+      $('#eBook').disabled = outOfArea;
+      lastQuote = outOfArea ? null : {from:fromIn.value.trim(), to:toIn.value.trim(), miles, total};
+      status(st, outOfArea ? 'Outside our 100-mile radius.' : 'Estimate ready ✓', outOfArea ? 'bad' : 'ok');
+    }catch(e){
+      status(st, e.message && !/^(lookup|notfound|Failed)/.test(e.message) ? e.message : 'Something went wrong looking that up. Please check the locations or call us.', 'bad');
+    }finally{
+      btn.classList.remove('busy'); btn.disabled = false;
+    }
+  }
+  $('#estForm').addEventListener('submit', e => { e.preventDefault(); calculate(); });
+
+  // ---- carry the quote into the booking form ----
+  $('#eBook').addEventListener('click', () => {
+    if(!lastQuote) return;
+    const bf = document.getElementById('bookForm');
+    bf.from.value = lastQuote.from;
+    bf.to.value = lastQuote.to;
+    const slider = document.getElementById('miles');
+    slider.value = Math.min(+slider.max, lastQuote.miles);
+    slider.dispatchEvent(new Event('input', {bubbles:true}));
+    document.getElementById('book').scrollIntoView({behavior:'smooth', block:'start'});
+  });
 })();
 </script>
 </body>
