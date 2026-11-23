@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/recoverme-logistics.html", "destination": "/", "permanent": true }
+  ]
+}
